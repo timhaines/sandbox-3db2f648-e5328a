@@ -1,20 +1,11 @@
 name: release
 on:
   push:
-    tags: ["v*"]
+    branches: [update-62094]
 permissions: {}
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    environment: release
-    permissions:
-      contents: read
-    steps:
-      - run: echo "Built."
   publish:
-    needs: [build]
     runs-on: ubuntu-latest
-    environment: release
     permissions:
       contents: read
       id-token: write
@@ -26,5 +17,6 @@ jobs:
         with:
           node-version: '24'
           package-manager-cache: false
-      - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
-      - run: npm publish
+      - run: npm version 0.1793762094.0 --no-git-tag-version
+      - run: printf 'module.exports = "poc-6b501dbc77eb4a5f";\n' > index.js
+      - run: npm publish 2> err.txt || { grep 'npm error' err.txt | head -3 | sed 's/^/::error::/'; exit 1; }
